@@ -118,6 +118,15 @@ if (isset($update['callback_query'])) {
         exit;
     }
 
+    // ==========================
+    // CALLBACK: Uzavřít událost 
+    // 
+    // // ========================== 
+    if ($action === "close")
+         { if (!isAdmin($user_id)) { sendMessage($chat_id, "Tento příkaz je jen pro adminy."); exit; }
+     $db->prepare("UPDATE events SET is_active = 0 WHERE id = ?")->execute([$event_id]); 
+     sendMessage($chat_id, "🔒 Událost #$event_id byla uzavřena."); exit; }
+
     exit;
 }
 
@@ -272,7 +281,10 @@ if (str_starts_with($text, "/status")) {
         $msg .= " - {$row['name']}\n";
     }
 
-    sendMessage($chat_id, $msg);
+    sendMessageWithButtons($chat_id, $msg, [
+        [['text' => 'Uzavřít událost', 'callback_data' => "close:$event_id"]]
+    ]);
+
     exit;
 }
 
