@@ -67,6 +67,8 @@ if (isset($update['callback_query'])) {
 
     list($action, $event_id) = explode(":", $data);
 
+    $db->prepare("INSERT IGNORE INTO responses (event_id, telegram_id, name) VALUES (?, ?, ?)")->execute([$event_id, $user_id, $name]);
+
     // Přijdu
     if ($action === "come_yes") {
         $db->prepare("UPDATE responses SET will_come = 1 WHERE telegram_id = ? AND event_id = ?")
