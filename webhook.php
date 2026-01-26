@@ -14,39 +14,10 @@ $BOT_TOKEN = "SEM_DEJ_TOKEN";
 // ==========================
 //  DATABASE INIT
 // ==========================
-$db = new PDO('sqlite:data.db');
+$$db = new PDO( "mysql:host={$db_config['db_host']};dbname={$db_config['db_name']};charset=utf8mb4",
+ $db_config['db_user'], $db_config['db_pass'],
+  [ PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC ] );
 $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-// Události
-$db->exec("
-CREATE TABLE IF NOT EXISTS events (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    title TEXT,
-    date TEXT,
-    is_active INTEGER DEFAULT 1
-);
-");
-
-// Odpovědi
-$db->exec("
-CREATE TABLE IF NOT EXISTS responses (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    event_id INTEGER,
-    telegram_id INTEGER,
-    name TEXT,
-    will_come INTEGER,
-    brings TEXT,
-    does TEXT,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-);
-");
-
-// Admini
-$db->exec("
-CREATE TABLE IF NOT EXISTS admins (
-    telegram_id INTEGER PRIMARY KEY
-);
-");
 
 // ==========================
 //  TELEGRAM HELPERS
