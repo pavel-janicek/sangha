@@ -6,5 +6,4 @@ if (!defined('ALLOW_ACCESS')) {
 }
 
 // Sem pridej realny kody.
-$bot_token = "";
-$admin_id = "";
+$BOT_TOKEN = "";
