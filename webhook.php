@@ -64,6 +64,7 @@ if (isset($update['callback_query'])) {
     $data = $cb['data'];
     $user_id = $cb['from']['id'];
     $chat_id = $cb['message']['chat']['id'];
+    $name = $cb['from']['first_name'];
 
     list($action, $event_id) = explode(":", $data);
 
