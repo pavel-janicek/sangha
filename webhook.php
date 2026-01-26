@@ -248,7 +248,7 @@ if (str_starts_with($text, "/addevent")) {
 //  COMMAND: /events
 // ==========================
 if ($text === "/events") {
-    $events = $db->query("SELECT * FROM events ORDER BY id DESC")->fetchAll(PDO::FETCH_ASSOC);
+    $events = $db->query("SELECT * FROM events WHERE is_active = 1 ORDER BY id DESC")->fetchAll(PDO::FETCH_ASSOC);
 
     if (!$events) {
         sendMessage($chat_id, "Žádné události zatím nejsou.");
