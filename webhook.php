@@ -119,62 +119,66 @@ if (isset($update['callback_query'])) {
     }
 
     // ==========================
-    // CALLBACK: Uzavřít událost 
-    // 
-    // // ========================== 
-    if ($action === "close")
-         { if (!isAdmin($user_id)) { sendMessage($chat_id, "Tento příkaz je jen pro adminy."); exit; }
-     $db->prepare("UPDATE events SET is_active = 0 WHERE id = ?")->execute([$event_id]); 
-     sendMessage($chat_id, "🔒 Událost #$event_id byla uzavřena."); exit; }
-
-     // ==========================
-//  CALLBACK: status
-// ==========================
-if ($action === "status") {
-
-    if (!isAdmin($user_id)) {
-        sendMessage($chat_id, "Tento příkaz je jen pro adminy.");
+    // CALLBACK: Uzavřít událost
+    // ==========================
+    if ($action === "close") {
+        if (!isAdmin($user_id)) {
+            sendMessage($chat_id, "Tento příkaz je jen pro adminy.");
+            exit;
+        }
+        $db->prepare("UPDATE events SET is_active = 0 WHERE id = ?")->execute([$event_id]);
+        sendMessage($chat_id, "🔒 Událost #$event_id byla uzavřena.");
         exit;
     }
 
-    $stmt = $db->prepare("SELECT * FROM events WHERE id = ?");
-    $stmt->execute([$event_id]);
-    $event = $stmt->fetch();
+    // ==========================
+    // CALLBACK: status
+    // ==========================
+    if ($action === "status") {
 
-    if (!$event) {
-        sendMessage($chat_id, "Událost nenalezena.");
+        if (!isAdmin($user_id)) {
+            sendMessage($chat_id, "Tento příkaz je jen pro adminy.");
+            exit;
+        }
+
+        $stmt = $db->prepare("SELECT * FROM events WHERE id = ?");
+        $stmt->execute([$event_id]);
+        $event = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$event) {
+            sendMessage($chat_id, "Událost nenalezena.");
+            exit;
+        }
+
+        $coming = $db->prepare("SELECT * FROM responses WHERE event_id = ? AND will_come = 1");
+        $coming->execute([$event_id]);
+        $coming = $coming->fetchAll(PDO::FETCH_ASSOC);
+
+        $not = $db->prepare("SELECT * FROM responses WHERE event_id = ? AND will_come = 0");
+        $not->execute([$event_id]);
+        $not = $not->fetchAll(PDO::FETCH_ASSOC);
+
+        $msg = "📋 Přehled pro událost: {$event['title']}\n\n";
+
+        $msg .= "🟢 Přijdou:\n";
+        foreach ($coming as $row) {
+            $line = " - {$row['name']}";
+            if ($row['brings']) $line .= " (přinese: {$row['brings']})";
+            if ($row['does'])   $line .= " (udělá: {$row['does']})";
+            $msg .= $line . "\n";
+        }
+
+        $msg .= "\n🔴 Nepřijdou:\n";
+        foreach ($not as $row) {
+            $msg .= " - {$row['name']}\n";
+        }
+
+        sendMessageWithButtons($chat_id, $msg, [
+            [['text' => 'Uzavřít událost', 'callback_data' => "close:$event_id"]]
+        ]);
+
         exit;
     }
-
-    $coming = $db->prepare("SELECT * FROM responses WHERE event_id = ? AND will_come = 1");
-    $coming->execute([$event_id]);
-    $coming = $coming->fetchAll();
-
-    $not = $db->prepare("SELECT * FROM responses WHERE event_id = ? AND will_come = 0");
-    $not->execute([$event_id]);
-    $not = $not->fetchAll();
-
-    $msg = "📋 Přehled pro událost: {$event['title']}\n\n";
-
-    $msg .= "🟢 Přijdou:\n";
-    foreach ($coming as $row) {
-        $line = " - {$row['name']}";
-        if ($row['brings']) $line .= " (přinese: {$row['brings']})";
-        if ($row['does'])   $line .= " (udělá: {$row['does']})";
-        $msg .= $line . "\n";
-    }
-
-    $msg .= "\n🔴 Nepřijdou:\n";
-    foreach ($not as $row) {
-        $msg .= " - {$row['name']}\n";
-    }
-
-    sendMessageWithButtons($chat_id, $msg, [
-        [['text' => 'Uzavřít událost', 'callback_data' => "close:$event_id"]]
-    ]);
-
-    exit;
-}
 
 
     exit;
@@ -249,16 +253,16 @@ if ($text === "/events") {
         exit;
     }
 
-    $buttons = [
-         [['text' => 'Vybrat', 'callback_data' => "select:{$e['id']}"]]
-    ];
-
-    // Admin dostane navíc tlačítko Status
-     if (isAdmin($user_id)) { 
-        $buttons[] = [['text' => 'Status', 'callback_data' => "status:{$e['id']}"]]; 
-        } 
-
     foreach ($events as $e) {
+        $buttons = [
+            [['text' => 'Vybrat', 'callback_data' => "select:{$e['id']}"]]
+        ];
+
+        // Admin dostane navíc tlačítko Status
+        if (isAdmin($user_id)) {
+            $buttons[] = [['text' => 'Status', 'callback_data' => "status:{$e['id']}"]];
+        }
+
         sendMessageWithButtons($chat_id, "Událost #{$e['id']}: {$e['title']}", $buttons);
     }
 
