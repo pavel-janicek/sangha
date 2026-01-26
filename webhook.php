@@ -314,6 +314,50 @@ if ($event_id) {
 }
 
 // ==========================
+//  COMMAND: /help
+// ==========================
+if ($text === "/help") {
+
+    if (isAdmin($user_id)) {
+
+        $msg = "🛠 *Nápověda pro adminy*\n\n";
+        $msg .= "Dostupné příkazy:\n";
+        $msg .= "• /events – zobrazí seznam událostí\n";
+        $msg .= "• /addevent <název> – vytvoří novou událost\n";
+        $msg .= "• /status <id> – zobrazí přehled účastníků\n";
+        $msg .= "• /addadmin <id> – přidá nového admina\n\n";
+        $msg .= "Dostupná tlačítka:\n";
+        $msg .= "• Vybrat – otevře menu události\n";
+        $msg .= "• Uzavřít událost – zamkne událost proti změnám\n\n";
+        $msg .= "Uživatelé mohou používat:\n";
+        $msg .= "• Přijdu / Nepřijdu\n";
+        $msg .= "• Přinesu…\n";
+        $msg .= "• Udělám…\n";
+
+        sendMessage($chat_id, $msg);
+        exit;
+
+    } else {
+
+        $msg = "ℹ️ *Nápověda*\n\n";
+        $msg .= "Co můžeš dělat:\n";
+        $msg .= "• Zjistit události (tlačítko)\n";
+        $msg .= "• Vybrat událost a potvrdit účast:\n";
+        $msg .= "   – Přijdu\n";
+        $msg .= "   – Nepřijdu\n";
+        $msg .= "   – Přinesu…\n";
+        $msg .= "   – Udělám…\n\n";
+        $msg .= "Příkazy:\n";
+        $msg .= "• /events – zobrazí seznam událostí\n";
+        $msg .= "• /help – zobrazí tuto nápovědu\n";
+
+        sendMessage($chat_id, $msg);
+        exit;
+    }
+}
+
+
+// ==========================
 //  DEFAULT
 // ==========================
 sendMessage($chat_id, "Použij: /events nebo /event <id>");
