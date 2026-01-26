@@ -22,7 +22,8 @@ $db = new PDO(
 // ==========================
 //  TELEGRAM HELPERS
 // ==========================
-function sendMessage($chat_id, $text) {
+function sendMessage($chat_id, $text)
+{
     global $BOT_TOKEN;
     file_get_contents("https://api.telegram.org/bot$BOT_TOKEN/sendMessage?" . http_build_query([
         'chat_id' => $chat_id,
@@ -30,7 +31,8 @@ function sendMessage($chat_id, $text) {
     ]));
 }
 
-function sendMessageWithButtons($chat_id, $text, $buttons) {
+function sendMessageWithButtons($chat_id, $text, $buttons)
+{
     global $BOT_TOKEN;
 
     $payload = [
@@ -44,7 +46,8 @@ function sendMessageWithButtons($chat_id, $text, $buttons) {
     file_get_contents("https://api.telegram.org/bot$BOT_TOKEN/sendMessage?" . http_build_query($payload));
 }
 
-function isAdmin($id) {
+function isAdmin($id)
+{
     global $db;
     $stmt = $db->prepare("SELECT 1 FROM admins WHERE telegram_id = ?");
     $stmt->execute([$id]);
@@ -68,12 +71,12 @@ if (isset($update['callback_query'])) {
 
     list($action, $event_id) = explode(":", $data);
 
-    $db->prepare(" INSERT INTO responses (event_id, telegram_id, name) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE name = VALUES(name) ")->execute([$event_id, $user_id, $name]);// Přijdu
-    
+    $db->prepare(" INSERT INTO responses (event_id, telegram_id, name) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE name = VALUES(name) ")->execute([$event_id, $user_id, $name]); // Přijdu
+
     // Přijdu
     if ($action === "come_yes") {
         $db->prepare("UPDATE responses SET will_come = 1 WHERE telegram_id = ? AND event_id = ?")
-           ->execute([$user_id, $event_id]);
+            ->execute([$user_id, $event_id]);
         sendMessage($chat_id, "👍 Zapsal jsem, že přijdeš.");
         exit;
     }
@@ -81,7 +84,7 @@ if (isset($update['callback_query'])) {
     // Nepřijdu
     if ($action === "come_no") {
         $db->prepare("UPDATE responses SET will_come = 0 WHERE telegram_id = ? AND event_id = ?")
-           ->execute([$user_id, $event_id]);
+            ->execute([$user_id, $event_id]);
         sendMessage($chat_id, "👋 Zapsal jsem, že nepřijdeš.");
         exit;
     }
@@ -89,20 +92,20 @@ if (isset($update['callback_query'])) {
     // Přinesu…
     if ($action === "bring") {
         // automaticky přijde 
-        $db->prepare("UPDATE responses SET will_come = 1 WHERE telegram_id = ? AND event_id = ?") ->execute([$user_id, $event_id]);
+        $db->prepare("UPDATE responses SET will_come = 1 WHERE telegram_id = ? AND event_id = ?")->execute([$user_id, $event_id]);
         sendMessage($chat_id, "Co přineseš?");
         $db->prepare("UPDATE responses SET brings = '__WAITING__' WHERE telegram_id = ? AND event_id = ?")
-           ->execute([$user_id, $event_id]);
+            ->execute([$user_id, $event_id]);
         exit;
     }
 
     // Udělám…
     if ($action === "do") {
         // automaticky přijde
-        $db->prepare("UPDATE responses SET will_come = 1 WHERE telegram_id = ? AND event_id = ?") ->execute([$user_id, $event_id]);
+        $db->prepare("UPDATE responses SET will_come = 1 WHERE telegram_id = ? AND event_id = ?")->execute([$user_id, $event_id]);
         sendMessage($chat_id, "Co uděláš?");
         $db->prepare("UPDATE responses SET does = '__WAITING__' WHERE telegram_id = ? AND event_id = ?")
-           ->execute([$user_id, $event_id]);
+            ->execute([$user_id, $event_id]);
         exit;
     }
 
@@ -112,7 +115,7 @@ if (isset($update['callback_query'])) {
         // Ujisti se, že uživatel má záznam v responses
         $db->prepare("INSERT IGNORE INTO responses (event_id, telegram_id, name)
                       VALUES (?, ?, ?)")
-           ->execute([$event_id, $user_id, $name]);
+            ->execute([$event_id, $user_id, $name]);
 
         // Pošli tlačítka
         sendMessageWithButtons($chat_id, "Vybral jsi událost #$event_id. Co chceš udělat?", [
@@ -293,7 +296,7 @@ if (str_starts_with($text, "/event")) {
     }
 
     $db->prepare("INSERT OR IGNORE INTO responses (event_id, telegram_id, name) VALUES (?, ?, ?)")
-       ->execute([$event_id, $user_id, $name]);
+        ->execute([$event_id, $user_id, $name]);
 
     sendMessageWithButtons($chat_id, "Vybral jsi událost: {$event['title']}", [
         [['text' => 'Přijdu', 'callback_data' => "come_yes:$event_id"]],
@@ -365,7 +368,7 @@ $event_id = $stmt->fetchColumn();
 
 if ($event_id) {
     $db->prepare("UPDATE responses SET brings = ? WHERE telegram_id = ? AND event_id = ?")
-       ->execute([$text, $user_id, $event_id]);
+        ->execute([$text, $user_id, $event_id]);
     sendMessage($chat_id, "🧺 Zapisuji, že přineseš: $text");
     exit;
 }
@@ -376,7 +379,7 @@ $event_id = $stmt->fetchColumn();
 
 if ($event_id) {
     $db->prepare("UPDATE responses SET does = ? WHERE telegram_id = ? AND event_id = ?")
-       ->execute([$text, $user_id, $event_id]);
+        ->execute([$text, $user_id, $event_id]);
     sendMessage($chat_id, "👨‍🍳 Zapisuji, že uděláš: $text");
     exit;
 }
@@ -404,7 +407,6 @@ if ($text === "/help") {
 
         sendMessage($chat_id, $msg);
         exit;
-
     } else {
 
         $msg = "ℹ️ *Nápověda*\n\n";
@@ -429,5 +431,4 @@ if ($text === "/help") {
 //  DEFAULT
 // ==========================
 sendMessage($chat_id, "Napiš /help pro zobrazení nápovědy.");
-
-?>
+exit;
