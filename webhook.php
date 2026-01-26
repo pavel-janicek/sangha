@@ -7,11 +7,6 @@ include 'config.php';
 <?php
 
 // ==========================
-//  CONFIG
-// ==========================
-$BOT_TOKEN = "SEM_DEJ_TOKEN";
-
-// ==========================
 //  DATABASE INIT
 // ==========================
 $$db = new PDO( "mysql:host={$db_config['db_host']};dbname={$db_config['db_name']};charset=utf8mb4",
