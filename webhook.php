@@ -428,6 +428,6 @@ if ($text === "/help") {
 // ==========================
 //  DEFAULT
 // ==========================
-sendMessage($chat_id, "Použij: /events nebo /event <id>");
+sendMessage($chat_id, "Napiš /help pro zobrazení nápovědy.");
 
 ?>
