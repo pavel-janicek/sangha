@@ -5,13 +5,8 @@ if (!defined('ALLOW_ACCESS')) {
     exit('Access denied.');
 }
 
-// Sem pridej realny kody.
-$BOT_TOKEN = "SEM_DEJ_TOKEN";
-
-// Database configuration
-$db_config = [
-    'host' => 'localhost',
-    'dbname' => 'dbname',
-    'user' => 'dbuser',
-    'password' => 'dbpassword'
-];
+return [ 'db_host' => 'localhost', 
+'db_name' => 'chlebickybot', 
+'db_user' => 'UZIVATEL', 
+'db_pass' => 'HESLO', 
+'bot_token' => 'TVŮJ_TELEGRAM_TOKEN' ];

@@ -2,16 +2,23 @@
 // Define a constant to indicate authorized access
 define('ALLOW_ACCESS', true);
 
-include 'config.php';
+$config = require __DIR__ . '/config.php';
 
-<?php
+ $BOT_TOKEN = $config['bot_token'];
 
 // ==========================
 //  DATABASE INIT
 // ==========================
-$$db = new PDO( "mysql:host={$db_config['db_host']};dbname={$db_config['db_name']};charset=utf8mb4",
- $db_config['db_user'], $db_config['db_pass'],
-  [ PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC ] );
+$db = new PDO(
+    "mysql:host={$config['db_host']};dbname={$config['db_name']};charset=utf8mb4",
+    $config['db_user'],
+    $config['db_pass'],
+    [
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
+    ]
+);
+
 $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
 // ==========================
