@@ -87,6 +87,8 @@ if (isset($update['callback_query'])) {
 
     // Přinesu…
     if ($action === "bring") {
+        // automaticky přijde 
+        $db->prepare("UPDATE responses SET will_come = 1 WHERE telegram_id = ? AND event_id = ?") ->execute([$user_id, $event_id]);
         sendMessage($chat_id, "Co přineseš?");
         $db->prepare("UPDATE responses SET brings = '__WAITING__' WHERE telegram_id = ? AND event_id = ?")
            ->execute([$user_id, $event_id]);
@@ -95,6 +97,8 @@ if (isset($update['callback_query'])) {
 
     // Udělám…
     if ($action === "do") {
+        // automaticky přijde
+        $db->prepare("UPDATE responses SET will_come = 1 WHERE telegram_id = ? AND event_id = ?") ->execute([$user_id, $event_id]);
         sendMessage($chat_id, "Co uděláš?");
         $db->prepare("UPDATE responses SET does = '__WAITING__' WHERE telegram_id = ? AND event_id = ?")
            ->execute([$user_id, $event_id]);
