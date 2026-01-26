@@ -4,7 +4,7 @@ define('ALLOW_ACCESS', true);
 
 $config = require __DIR__ . '/config.php';
 
- $BOT_TOKEN = $config['bot_token'];
+$BOT_TOKEN = $config['bot_token'];
 
 // ==========================
 //  DATABASE INIT
@@ -18,8 +18,6 @@ $db = new PDO(
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
     ]
 );
-
-$db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
 // ==========================
 //  TELEGRAM HELPERS
@@ -98,6 +96,25 @@ if (isset($update['callback_query'])) {
         sendMessage($chat_id, "Co uděláš?");
         $db->prepare("UPDATE responses SET does = '__WAITING__' WHERE telegram_id = ? AND event_id = ?")
            ->execute([$user_id, $event_id]);
+        exit;
+    }
+
+    // Vybrat událost
+    if ($action === "select") {
+
+        // Ujisti se, že uživatel má záznam v responses
+        $db->prepare("INSERT IGNORE INTO responses (event_id, telegram_id, name)
+                      VALUES (?, ?, ?)")
+           ->execute([$event_id, $user_id, $name]);
+
+        // Pošli tlačítka
+        sendMessageWithButtons($chat_id, "Vybral jsi událost #$event_id. Co chceš udělat?", [
+            [['text' => 'Přijdu',    'callback_data' => "come_yes:$event_id"]],
+            [['text' => 'Nepřijdu', 'callback_data' => "come_no:$event_id"]],
+            [['text' => 'Přinesu…', 'callback_data' => "bring:$event_id"]],
+            [['text' => 'Udělám…',  'callback_data' => "do:$event_id"]],
+        ]);
+
         exit;
     }
 
