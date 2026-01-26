@@ -199,10 +199,17 @@ if ($text === "/events") {
         exit;
     }
 
+    $buttons = [
+         [['text' => 'Vybrat', 'callback_data' => "select:{$e['id']}"]]
+    ];
+
+    // Admin dostane navíc tlačítko Status
+     if (isAdmin($user_id)) { 
+        $buttons[] = [['text' => 'Status', 'callback_data' => "status:{$e['id']}"]]; 
+        } 
+
     foreach ($events as $e) {
-        sendMessageWithButtons($chat_id, "Událost #{$e['id']}: {$e['title']}", [
-            [['text' => 'Vybrat', 'callback_data' => "select:{$e['id']}"]]
-        ]);
+        sendMessageWithButtons($chat_id, "Událost #{$e['id']}: {$e['title']}", $buttons);
     }
 
     exit;
