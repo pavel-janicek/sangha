@@ -384,6 +384,25 @@ if ($event_id) {
     exit;
 }
 
+/**
+ * COMMAND: /start
+ */
+if ($text === "/start") {
+    $stmt = $db->prepare("SELECT * FROM admins");
+    $stmt->execute();
+    $admins = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    //first run - add first admin
+    if (empty($admins)) {
+        $db->prepare("INSERT INTO admins (telegram_id) VALUES (?)")->execute([$user_id]);
+        sendMessage($chat_id, "Ahoj $name! Jsi první admin tohoto bota a byl jsi přidán jako admin. Napiš /help pro zobrazení nápovědy.");
+        exit;
+    } else {
+        sendMessage($chat_id, "Ahoj $name! Tento bot slouží k organizaci událostí. Napiš /help pro zobrazení nápovědy.");
+        exit;
+    }
+}
+
 // ==========================
 //  COMMAND: /help
 // ==========================
