@@ -98,8 +98,6 @@ curl https://api.telegram.org/bot<YOUR_TOKEN>/getWebhookInfo
 
 Vrátí ti:
 ```
-
-
 {
   "ok": true,
   "result": {
@@ -111,9 +109,15 @@ Vrátí ti:
 }
 ```
 
+## Plány do budoucna
+Plány, asi podle mé interní prioritizace:
+ - Přidat automatické mazání uzavřených akcí po X dnech
+ - Nějaké ošetření, aby třeba Filip neviděl akci "Vybíráme překvapení pro Filipa"
+ - Přidat možnost překladů
+
 
 ## Závěrem
-Kód je psaný za značné pomoci AI botů a v češtině (co se zpráv týče)
+Kód je psaný za značné pomoci AI botů a v češtině (co se zpráv týče). Celý je Open Source 
 
 Dlouhodobý plán je poskytnout možnost překladů
 
