@@ -59,6 +59,41 @@ function isAdmin($id)
 // ==========================
 $update = json_decode(file_get_contents("php://input"), true);
 
+// ===============================
+//  AUTO-CLEANUP (max 1× denně)
+// ===============================
+$cleanupFile = __DIR__ . '/cleanup_last.txt';
+$now = time();
+$last = file_exists($cleanupFile) ? intval(file_get_contents($cleanupFile)) : 0;
+
+// Spustí se jen jednou za 24 hodin
+if ($now - $last > 86400) {
+
+    // Najdi události starší než 30 dní a zároveň neaktivní
+    $stmt = $db->prepare("
+        SELECT id 
+        FROM events 
+        WHERE is_active = 0 
+        AND date < DATE_SUB(CURDATE(), INTERVAL 30 DAY)
+    ");
+    $stmt->execute();
+    $oldEvents = $stmt->fetchAll(PDO::FETCH_COLUMN);
+
+    if (!empty($oldEvents)) {
+        $in = str_repeat('?,', count($oldEvents) - 1) . '?';
+
+        // Smaž odpovědi
+        $delResp = $db->prepare("DELETE FROM responses WHERE event_id IN ($in)");
+        $delResp->execute($oldEvents);
+
+        // Smaž události
+        $delEvents = $db->prepare("DELETE FROM events WHERE id IN ($in)");
+        $delEvents->execute($oldEvents);
+    }
+
+    file_put_contents($cleanupFile, $now);
+}
+
 // ==========================
 //  CALLBACK HANDLER
 // ==========================
